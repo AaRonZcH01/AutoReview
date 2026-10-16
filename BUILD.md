@@ -22,7 +22,11 @@ $env:PYTHONPATH = 'src/backend'
 
 ## 源码启动
 
+源码归档不包含 CLI 二进制和账户。首次启动前先下载并校验固定的公共 CLI；不要求安装 Codex 桌面，也不会继承其他软件的账户。下列环境变量仅为当前启动选择已校验的组件。
+
 ```powershell
+.\.venv\Scripts\python.exe scripts/fetch_codex.py
+$env:AUTOREVIEW_CODEX_EXE = Join-Path $PWD 'resources/codex.exe'
 .\Start-Current.ps1 -Browser
 # 配置了 Rust 后可直接启动桌面外壳
 .\Start-Current.ps1

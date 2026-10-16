@@ -41,9 +41,11 @@
 
 ```powershell
 .\Prepare-Environment.ps1
+.\.venv\Scripts\python.exe scripts/fetch_codex.py
 pnpm build
 $env:PYTHONPATH = 'src/backend'
 .\.venv\Scripts\python.exe -m pytest tests/v2 -q
+$env:AUTOREVIEW_CODEX_EXE = Join-Path $PWD 'resources/codex.exe'
 .\Start-Current.ps1 -Browser
 ```
 
