@@ -1,0 +1,28 @@
+{
+  "name": "autoreview",
+  "version": "1.4.2",
+  "private": true,
+  "description": "Portable teacher workspace for elementary English homework review",
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.11.5",
+    "@types/node": "24.13.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.1"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit --strict --jsx react-jsx --module nodenext --moduleResolution nodenext --target ES2022 src/frontend/vite-env.d.ts src/frontend/main.tsx && vite build"
+  }
+}

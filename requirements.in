@@ -1,0 +1,16 @@
+# Direct Python dependencies for the PRD v0.3 stack.
+# Exact resolved versions are recorded in requirements.lock.txt.
+fastapi
+pydantic
+uvicorn
+python-multipart
+pillow
+openpyxl
+opencv-python
+rapidocr
+onnxruntime
+# Local verification utilities; no paid model API SDK.
+pytest
+httpx
+pytest-asyncio
+pyinstaller

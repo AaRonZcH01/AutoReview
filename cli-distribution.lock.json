@@ -1,0 +1,25 @@
+{
+  "cliVersion": "codex-cli 0.163.0",
+  "files": [
+    {
+      "bytes": 341270320,
+      "name": "codex.exe",
+      "sha256": "2692c8c7bb2cf8b0aefe638741fc90236f4b824c59578ce84994f9de58200993"
+    },
+    {
+      "bytes": 74921264,
+      "name": "codex-code-mode-host.exe",
+      "sha256": "07f3869f0849cd54b31cec1f86ec796f004501bd3a215135c1facc883a2b9988"
+    },
+    {
+      "bytes": 8217904,
+      "name": "codex-command-runner.exe",
+      "sha256": "fc89dc66c806f25675b9be1e7dafb226807d22761e9741a3bb24b667b803d46c"
+    },
+    {
+      "bytes": 17700144,
+      "name": "codex-windows-sandbox-setup.exe",
+      "sha256": "2efc67f77de2658667c1481e00a1c4c964d3e8f6d4f39b638620d80b9d0f6d8a"
+    }
+  ]
+}

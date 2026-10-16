@@ -1,0 +1,7 @@
+{
+  "identifier": "main-local",
+  "description": "Owned loopback main window lifecycle access; handlers also check the active service port",
+  "windows": ["main"],
+  "remote": {"urls": ["http://127.0.0.1:*"]},
+  "permissions": ["core:default", "allow-restart-backend", "allow-backend-status", "allow-exit-app", "allow-hide-to-tray"]
+}

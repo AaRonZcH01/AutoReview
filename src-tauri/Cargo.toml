@@ -1,0 +1,17 @@
+[package]
+name = "autoreview-desktop"
+version = "1.4.2"
+description = "AutoReview teacher workspace"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+serde_json = "1"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

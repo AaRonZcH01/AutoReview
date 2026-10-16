@@ -1,0 +1,6 @@
+import {useEffect,useRef,useState} from 'react';
+export function ReferenceFileMenu({busy,exportFile,importFile}:{busy:boolean,exportFile:()=>Promise<any>,importFile:(file:File)=>Promise<any>}){
+ const [open,Open]=useState(false);const root=useRef<HTMLDivElement>(null);
+ useEffect(()=>{if(!open)return;const close=(e:PointerEvent)=>{if(!root.current?.contains(e.target as Node))Open(false)},key=(e:KeyboardEvent)=>{if(e.key==='Escape')Open(false)};document.addEventListener('pointerdown',close);document.addEventListener('keydown',key);return()=>{document.removeEventListener('pointerdown',close);document.removeEventListener('keydown',key)}},[open]);
+ return <div className='reference-file-menu' ref={root}><button disabled={busy} aria-haspopup='menu' aria-expanded={open} onClick={()=>Open(!open)}>导入／导出答案包 ▾</button>{open&&<div role='menu' className='reference-file-options'><button role='menuitem' disabled={busy} onClick={()=>{Open(false);exportFile()}}>导出范本答案包…</button><label className='button' role='menuitem'>导入范本答案包…<input hidden type='file' accept='.zip' onChange={e=>{const file=e.target.files?.[0];e.target.value='';if(!file)return;Open(false);importFile(file)}}/></label></div>}</div>
+}
