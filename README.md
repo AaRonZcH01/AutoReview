@@ -1,8 +1,8 @@
 # AutoReview
 
-面向小学英语作业的 Windows 教师工作台。将范本和答案确认、作业导入或相机采集、云端观察、本地判分、人工复核与结果导出连在一起。
+面向小学英语作业的 Windows 教师工作台，支持范本与答案管理、图片导入与相机采集、云端识别、本地判分、教师复核和结果导出。
 
-当前版本：**1.4.2**。本项目不隶属于 OpenAI。软件不提供账户、订阅或额度，请使用自己的账户并遵守服务提供方的条款。
+当前版本：**1.4.2**。软件不提供账户、订阅或额度，使用前需登录自己的 ChatGPT 账户。
 
 ## 下载与使用
 
@@ -11,7 +11,6 @@
 - 安装版：运行 `AutoReview-1.4.2-windows-x64-setup.exe`。
 - 便携版：完整解压 `AutoReview-1.4.2-desktop-win-x64.zip`，双击其中的 `AutoReview.exe`，保留整个运行目录。
 - 未安装 WebView2 时，安装器会处理；便携版可运行包内的微软 WebView2 安装组件。
-- 首次使用账户列表为空，通过软件内的官方登录流程连接自己的 ChatGPT 账户。
 
 具体操作见 [教师使用说明](USER_GUIDE.md) 或 [Word 说明](USER_GUIDE.docx)。
 
@@ -21,23 +20,23 @@
 - 多班、多页纸签编排；本地图片批处理与逐张相机采集。
 - 流式确认后立即入队，或先保存本地、之后统一提交。
 - 批处理与流式并发独立设置，均支持 1–13，默认 10。
-- 默认范本 `gpt-6.1-sol / high`，学生识别 `gpt-6.1-sol / medium`；账户实际可用模型以官方返回为准。
+- 默认范本 `gpt-6.1-sol / high`，学生识别 `gpt-6.1-sol / medium`；可用模型以账户返回为准。
 - 保守复看可选，默认关闭；任务入队后冻结所用配置。
 - 原图定位、逐题人工改判、撤销与重做、失败阶段继续和跨页依赖处理。
 - 成绩与易错分析；CSV、XLSX、JSON、批注图片和 PDF 导出。
-- 本副本账户隔离、Windows 加密保存、账户删除；兼容 Codex CLI 组件的确认式更新。
+- 各副本账户隔离、Windows 加密保存、账户删除；Codex CLI 组件更新。
 
 ## 数据与账户
 
-资料库默认位于当前 Windows 用户的“文档/AutoReview/Library”，可在设置中选择其他位置。账户、设置和浏览器缓存放在本程序副本的 `.autoreview-private`，不包含在发行包中。
+资料库默认位于当前 Windows 用户的“文档/AutoReview/Library”，可在设置中更改。账户、设置和浏览器缓存按程序副本保存在 `.autoreview-private`。
 
-仅预览相机、拍照检查和本地导入不会自动上传；主动提交识别会将必要图片交给官方 Codex CLI，并使用所选账户的额度。不要在公开 Issue、日志附件或再分发包中包含自己的私有目录、资料库、试卷或令牌。
+相机预览、拍照检查和本地导入在本机完成；提交识别时，必要图片通过官方 Codex CLI 发送，并使用所选账户额度。
 
-便携版删除前应先执行“清除全部账户并退出”。直接删除文件夹不能触发 Windows 凭据库清理。详见 [隐私说明](PRIVACY.md) 与 [安全报告方式](SECURITY.md)。
+删除便携版前，请先执行“清除全部账户并退出”，以清理账户数据和 Windows 凭据库中的对应密钥。详见 [隐私说明](PRIVACY.md) 与 [安全报告方式](SECURITY.md)。
 
 ## 开发
 
-代码结构与构建步骤见 [BUILD.md](BUILD.md) 和 [ARCHITECTURE.md](ARCHITECTURE.md)。源码包含离线回归测试和合成测试材料，不包含开发过程使用过的试卷、账户或资料库。
+源码包含应用代码、离线回归测试、合成测试材料、依赖锁文件和构建脚本。代码结构与构建步骤见 [BUILD.md](BUILD.md) 和 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
 ```powershell
 .\Prepare-Environment.ps1
@@ -49,7 +48,7 @@ $env:AUTOREVIEW_CODEX_EXE = Join-Path $PWD 'resources/codex.exe'
 .\Start-Current.ps1 -Browser
 ```
 
-云端识别效果受照片、题型、模型和服务状态影响，最终成绩需由教师核实。现有验证范围见 [发布说明](CHANGELOG.md)；不保证全自动准确率或所有相机兼容。
+识别结果由教师复核，现有验证范围见 [发布说明](CHANGELOG.md)。
 
 ## 许可证
 

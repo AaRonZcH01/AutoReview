@@ -18,11 +18,11 @@ $env:PYTHONPATH = 'src/backend'
 .\.venv\Scripts\python.exe -m pytest tests/v2 -q
 ```
 
-准备脚本只安装锁文件中的依赖并执行本地检查，不访问个人认证、不调用云端模型。自定义 Python 路径可使用 `-PythonPath <python.exe>`。锁文件针对上述版本与 Windows x64，不承诺其他系统。
+准备脚本安装锁定依赖并执行本地检查。自定义 Python 路径使用 `-PythonPath <python.exe>`；锁文件适用于上述版本与 Windows x64。
 
 ## 源码启动
 
-源码归档不包含 CLI 二进制和账户。首次启动前先下载并校验固定的公共 CLI；不要求安装 Codex 桌面，也不会继承其他软件的账户。下列环境变量仅为当前启动选择已校验的组件。
+首次启动前，运行以下命令下载并校验固定版本的 Codex CLI；无需安装 Codex 桌面程序。
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/fetch_codex.py
@@ -41,7 +41,7 @@ $env:AUTOREVIEW_CODEX_EXE = Join-Path $PWD 'resources/codex.exe'
 .\Build-Desktop.ps1 -SkipRuntime
 ```
 
-后台使用 PyInstaller 打包。CLI 只从官方 `openai/codex` 的固定版本发布中获取四个公共可执行文件，按官方归档摘要及 `cli-distribution.lock.json` 的解压后摘要双重校验；不打包 CODEX_HOME、登录文件或个人设置。
+后台使用 PyInstaller 打包。CLI 只从官方 `openai/codex` 的固定版本发布中获取四个公共可执行文件，按官方归档摘要及 `cli-distribution.lock.json` 的解压后摘要双重校验。
 
 构建产物位于 `release/`。安装器与桌面 ZIP 包含前端、后台、CPU 方向模型、固定 CLI、说明与第三方许可证。单独 runtime ZIP 是可选的本地浏览器运行方式。
 
