@@ -2,14 +2,14 @@
 
 面向小学英语作业的 Windows 教师工作台，支持范本与答案管理、图片导入与相机采集、云端识别、本地判分、教师复核和结果导出。
 
-当前版本：**1.4.2**。软件不提供账户、订阅或额度，使用前需登录自己的 ChatGPT 账户。
+当前版本：**1.4.3**。软件不提供账户、订阅或额度，使用前需登录自己的 ChatGPT 账户。
 
 ## 下载与使用
 
 在 [Releases](https://github.com/AaRonZcH01/AutoReview/releases/latest) 下载 Windows x64 安装包或桌面便携 ZIP，并对照同一版本的 SHA256 清单。
 
-- 安装版：运行 `AutoReview-1.4.2-windows-x64-setup.exe`。
-- 便携版：完整解压 `AutoReview-1.4.2-desktop-win-x64.zip`，双击其中的 `AutoReview.exe`，保留整个运行目录。
+- 安装版：运行 `AutoReview-1.4.3-windows-x64-setup.exe`。
+- 便携版：完整解压 `AutoReview-1.4.3-desktop-win-x64.zip`，双击其中的 `AutoReview.exe`，保留整个运行目录。
 - 未安装 WebView2 时，安装器会处理；便携版可运行包内的微软 WebView2 安装组件。
 
 具体操作见 [教师使用说明](USER_GUIDE.md) 或 [Word 说明](USER_GUIDE.docx)。

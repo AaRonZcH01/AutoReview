@@ -115,6 +115,9 @@ def issues(draft, include_review=True):
         if a.get('kind') in ('choice','letter_choice','marked_choice') or a.get('response_encoding') in ('marked_choice','written_choice','mixed'):
             opts = a.get('options', [])
             accepted = [s.strip() for s in a.get('english', '').split(',') if s.strip()]
+            from .choice import multiple, option_ids
+            if multiple(a):
+                accepted = option_ids(a.get('english', ''), opts) or []
             if len(opts) < 2:
                 add(a, 'OPTIONS_INCOMPLETE', '选项不足两个，请在选项位置中补齐实际印刷选项。', 'options')
             seen_options = set()
@@ -128,9 +131,9 @@ def issues(draft, include_review=True):
                 pages = draft.get('page_ids') or draft.get('asset_ids', [])
                 if o.get('page_id') and o['page_id'] not in pages:
                     add(a, 'DEPENDENCY_SLOT', o['id']+' 选项所关联页面不存在，请重新选择页面。', field)
-            if not accepted or not set(accepted) <= {o['id'] for o in opts}:
-                add(a, 'CHOICE_ANSWER', '参考答案须为实际选项标识，如 B，而非选项整句。', 'english')
-            if a.get('selection_rule', 'single') == 'unknown' or (a.get('selection_rule', 'single') == 'single' and len(accepted) != 1):
+            if not accepted or len(set(accepted)) != len(accepted) or not set(accepted) <= {o['id'] for o in opts}:
+                add(a, 'CHOICE_ANSWER', '参考答案须为不重复的实际选项编号；多选例如 B,F，不填写解释或选项整句。', 'english')
+            if a.get('selection_rule', 'single') == 'unknown' or (not multiple(a) and len(accepted) != 1):
                 add(a, 'CHOICE_CARDINALITY', '请确认单选或多选及对应答案数量。', 'selection_rule')
         if include_review and draft.get('asset_ids') and not confirmed(draft, a):
             add(a, 'REVIEW_REQUIRED', '答案或位置尚待核对，可逐项或确认本页。')

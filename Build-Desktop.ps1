@@ -9,10 +9,20 @@ if(-not(Test-Path -LiteralPath $vswhere)){throw 'Windows C++ Build Tools is requ
 $vs=& $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
 if(-not $vs){throw 'C++ workload missing. Complete the Windows administrator installation prompt first.'}
 $taskPathBefore=$env:PATH
+$taskRustFlagsBefore=$env:CARGO_ENCODED_RUSTFLAGS
 try {
     $env:PATH="$(Split-Path -Parent $cargo);$taskPathBefore"
+    # Keep local build paths out of release panic strings and macro locations.
+    # Encoded flags preserve Windows user paths containing spaces.
+    $taskRemap=@()
+    foreach($taskPrefix in @($env:USERPROFILE,$PSScriptRoot)) {
+        $taskAlias=if($taskPrefix -eq $PSScriptRoot){'autoreview'}else{'build-user'}
+        $taskRemap+=('--remap-path-prefix='+$taskPrefix+'='+$taskAlias)
+        $taskRemap+=('--remap-path-prefix='+$taskPrefix.Replace('\','/')+'='+$taskAlias)
+    }
+    $env:CARGO_ENCODED_RUSTFLAGS=(@($taskRustFlagsBefore)+$taskRemap | Where-Object {$_}) -join [char]31
     & pnpm exec tauri build -- --locked
     if($LASTEXITCODE -ne 0){throw 'Desktop bundle failed'}
     & (Join-Path $PSScriptRoot '.venv/Scripts/python.exe') .delivery/package_desktop.py
     if($LASTEXITCODE -ne 0){throw 'Desktop distribution verification failed'}
-} finally { $env:PATH=$taskPathBefore }
+} finally { $env:PATH=$taskPathBefore; $env:CARGO_ENCODED_RUSTFLAGS=$taskRustFlagsBefore }

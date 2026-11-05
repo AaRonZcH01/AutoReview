@@ -100,7 +100,7 @@ def create_app(settings=None, provider=None, nonce=None, start_worker=True, stat
             if diagnostic_jobs: await asyncio.gather(*diagnostic_jobs,return_exceptions=True)
             power.close()
             service.close()
-    app = FastAPI(title='AutoReview', version='1.4.2', lifespan=lifespan, docs_url=None, redoc_url=None)
+    app = FastAPI(title='AutoReview', version='1.4.3', lifespan=lifespan, docs_url=None, redoc_url=None)
     app.state.service, app.state.runner, app.state.nonce = service, runner, secret
     backup_directories = set()
     app.state.data_users = 0

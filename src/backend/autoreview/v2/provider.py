@@ -152,7 +152,7 @@ class Rpc:
         self.events.clear()
         self.reader = asyncio.create_task(self.read(self.process))
         try:
-            self.server_info = await self.request('initialize', {'clientInfo': {'name': 'autoreview', 'version': '1.4.2'},
+            self.server_info = await self.request('initialize', {'clientInfo': {'name': 'autoreview', 'version': '1.4.3'},
                                               'capabilities': {'experimentalApi': True}}, timeout=30)
             await self.send({'method': 'initialized', 'params': {}})
         except BaseException:

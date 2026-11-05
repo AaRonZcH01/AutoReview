@@ -206,10 +206,10 @@ def test_stop_during_second_pass_discards_late_results_for_all_active_pages(serv
     asyncio.run(check())
 
 
-def test_new_run_freezes_v2_while_legacy_resume_reuses_v1_checkpoints(service):
+def test_new_run_freezes_v3_while_legacy_resume_reuses_v1_checkpoints(service):
     from autoreview.v2.core import digest
     provider=ClearProvider();runner,run,task=scene(service,provider)
-    assert run['verification_policy']=='blind-native-2'
+    assert run['verification_policy']=='blind-native-3'
     # Missing field is the exact representation of a persisted pre-v2 run.
     with service.store.connection(write=True) as db:
         run=service.store.put(db,'runs',{k:v for k,v in run.items() if k!='verification_policy'})
@@ -233,3 +233,13 @@ def test_new_run_freezes_v2_while_legacy_resume_reuses_v1_checkpoints(service):
         assert len(service.store.list(db,'recovery_adoptions'))==2
         assert digest(service.store.get(db,'observations',old_observation['id']))==frozen
         assert all(o['verification_policy']=='blind-native-1' for o in service.store.list(db,'observations'))
+
+
+def test_frozen_v2_run_keeps_its_policy_after_the_multi_choice_update(service):
+    provider=ClearProvider();runner,run,task=scene(service,provider)
+    with service.store.connection(write=True) as db:
+        service.store.put(db,'runs',{**run,'verification_policy':'blind-native-2'})
+    asyncio.run(runner.tick())
+    assert provider.calls[1]['variables']['crop_manifest']['policy_version']=='blind-native-2'
+    with service.store.connection() as db:
+        assert all(o['verification_policy']=='blind-native-2' for o in service.store.list(db,'observations'))

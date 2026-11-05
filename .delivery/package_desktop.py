@@ -20,6 +20,10 @@ def sha(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 assert APP.is_file() and NSIS.is_file() and (RUNTIME / 'AutoReview-Service.exe').is_file()
+# Refuse native binaries that disclose this build user's absolute home path.
+for spelling in {str(Path.home()), str(Path.home()).replace('\\', '/')} :
+    assert spelling.lower().encode() not in APP.read_bytes().lower(), 'Native build contains a local home path; rebuild with path remapping'
+    assert spelling.lower().encode('utf-16le') not in APP.read_bytes().lower(), 'Native build contains a local home path; rebuild with path remapping'
 webviews = sorted((Path(os.environ['LOCALAPPDATA']) / 'tauri/x64').rglob('MicrosoftEdgeWebView2RuntimeInstallerX64.exe'), key=lambda p: p.stat().st_mtime)
 assert webviews, 'Tauri offline WebView2 installer cache missing; run desktop build first'
 webview = webviews[-1]

@@ -76,12 +76,24 @@ def grade_observation(cell, answer):
         detail = grade_matching(__import__("autoreview.v2.contracts", fromlist=["LocalMatchingRule"]).LocalMatchingRule.model_validate(rule), [MatchingEdge.model_validate(e) for e in cell.get('edges', [])])
         return detail['status'], detail
     if encoding in ('written_choice', 'marked_choice', 'mixed') or kind in ('choice', 'letter_choice', 'marked_choice'):
+        from .choice import multiple, option_ids, channels
         marked = cell.get('selected_options', [])
         written = cell.get('written_options', [])
         if (written or not marked) and (cell.get('transcription_uncertain') or cell.get('ambiguous_glyphs') or cell.get('literal_evidence') in ('ambiguous','not_visible')):
             return 'unknown', {'reason': cell.get('unknown_reason') or '手写选项字母笔画不明确，需教师核实'}
         if (written or not marked and cell.get('raw_english')) and cell.get('literal_evidence') == 'not_applicable':
             return 'unknown', {'reason': '手写选项缺少明确的字形证据，需教师核实'}
+        if multiple(answer):
+            accepted = option_ids(answer.get('english', '') if kind == 'choice' else
+                answer.get('answer_spec', {}).get('accepted') or answer.get('english', ''), answer.get('options', []))
+            known = {o['id'] for o in answer.get('options', [])}
+            if not accepted or len(set(accepted)) != len(accepted) or known and not set(accepted) <= known:
+                return 'unknown', {'reason': '多选参考答案格式或选项对应关系无效，需先核对范本'}
+            values, reason = channels(cell, answer)
+            if reason:
+                return 'unknown', {'reason': reason}
+            observed = sorted(next(iter(values.values()), frozenset()))
+            return grade_choice(observed, accepted, multiple=True), {'observed_options': observed}
         if marked and written and set(marked) != set(written):
             return 'unknown', {'reason': '圈选与手写选项冲突'}
         observed = marked or written or ([cell['raw_english'].strip()] if cell.get('raw_english', '').strip() else [])
@@ -132,7 +144,18 @@ def resolve_page(reference: dict, page: dict, observation: dict | None) -> list[
         if 'observation' in override:
             status, typed_detail = grade_observation(effective_cell, answer)
         if "raw_english" in override and "status" not in override:
-            status = grade_text(raw, answer)
+            from .choice import multiple
+            if multiple(answer) and (answer.get('kind') in ('choice','letter_choice','marked_choice') or answer.get('response_encoding') in ('written_choice','marked_choice','mixed')):
+                # A deliberate teacher transcription replaces the machine's
+                # old option channels; those are still retained as evidence.
+                effective_cell = {**effective_cell,
+                    'raw_english': raw, 'selected_options': [], 'written_options': [],
+                    'uncertain': False, 'transcription_uncertain': False,
+                    'ambiguous_glyphs': [], 'literal_evidence': 'clear',
+                    'response_evidence': 'clear', 'visibility': 'visible'}
+                status, typed_detail = grade_observation(effective_cell, answer)
+            else:
+                status = grade_text(raw, answer)
         writing = next((item for item in (observation or {}).get("writing", [])
                         if item["question_id"] == answer["id"]), {})
         structure = next((s for s in (observation or {}).get('structure', []) if s['id'] == answer['id']), {})

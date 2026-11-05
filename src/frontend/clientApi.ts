@@ -21,7 +21,10 @@ export async function api(path:string,data?:any,method?:string,retryCount=0):Pro
   if(!r.ok&&result.code==='LIBRARY_MAINTENANCE'&&retryCount<4){await new Promise(resolve=>setTimeout(resolve,250));return api(path,data,method,retryCount+1)}
   if(!r.ok)throw new ApiError(r.status===401?'此窗口的本地会话已失效，请从当前版本入口重新打开。':(result.message||'操作失败')+(result.details?.missing_tags?' 编号：'+result.details.missing_tags.join('、'):''),r.status,result.code||'HTTP_ERROR',result.details,result.request_id||requestId,result.instance_id||r.headers.get('X-AutoReview-Instance')||'');
   if(path==='/state'){const next=result.instance_id,nextLibrary=result.library?.library_id;if(instance&&next&&instance!==next&&!trustedRecovery||library&&nextLibrary&&library!==nextLibrary){contextChanged=true;writeBlocked=true;throw new ApiError('服务或资料库已变化，请从当前入口重新打开；未保存草稿保留在本机。',409,'CONTEXT_CHANGED')}instance=next||instance;library=nextLibrary||library;trustedRecovery=false}
-  if(data!==undefined&&!['/session','/activity'].includes(path))window.dispatchEvent(new CustomEvent('autoreview:data-changed',{detail:path}));
+  // These POST endpoints inspect unsaved values without changing library data.
+  // Invalidating the task here creates a refresh -> validation -> refresh loop.
+  const inspection=/^\/tasks\/[^/]+\/(reference\/validate|scoring\/check)$/.test(path);
+  if(data!==undefined&&!inspection&&!['/session','/activity'].includes(path))window.dispatchEvent(new CustomEvent('autoreview:data-changed',{detail:path}));
   if(data===undefined&&/^\/assets\/[^/]+$/.test(path)){assetMetadata.set(path,result);if(assetMetadata.size>256)assetMetadata.delete(assetMetadata.keys().next().value!)}
   return result;
  }catch(e){if(epoch!==recoveryEpoch)throw new ApiError('本地服务已恢复，正在重新读取最新状态；未确认结果的修改请核对后再操作。',409,'RECOVERY_RETRY',{},requestId);if(e instanceof ApiError)throw e;writeBlocked=true;window.dispatchEvent(new Event('autoreview:unreachable'));throw new ApiError((e as Error).name==='AbortError'?'本次请求响应超时，修改仍保留；请查询状态后重试。':'本地服务暂时不可达，正在尝试恢复连接。未保存修改仍保留。',0,(e as Error).name==='AbortError'?'REQUEST_TIMEOUT':'NETWORK_ERROR',{},requestId)}finally{clearTimeout(timer);pendingRequests.delete(controller)}

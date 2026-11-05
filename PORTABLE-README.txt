@@ -1,4 +1,4 @@
-﻿AutoReview 1.4.2 自包含运行版 Windows x64
+﻿AutoReview 1.4.3 自包含运行版 Windows x64
 冻结日期：2026年10月16日
 
 桌面便携版完整解压后运行 AutoReview.exe；保留 runtime 与 docs 文件夹。

@@ -5,6 +5,7 @@ It does not promise detection of every possible secret.
 """
 from pathlib import Path
 import json
+import re
 import sys
 
 FORBIDDEN_DIRS = {'.autoreview-private', '.validation', 'profiles', 'attempt-artifacts', 'diagnostics'}

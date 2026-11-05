@@ -15,7 +15,8 @@ from .imaging import project, corners
 from .grading import grade_observation, comparable
 
 LEGACY_POLICY_VERSION = 'blind-native-1'
-POLICY_VERSION = 'blind-native-2'
+PREVIOUS_POLICY_VERSION = 'blind-native-2'
+POLICY_VERSION = 'blind-native-3'
 MAX_TILE_PIXELS = 28_000_000
 MAX_ATLAS_PIXELS = 32_000_000
 MAX_ATLAS_IMAGES = 6
@@ -112,7 +113,7 @@ def prepare(service, work_id, pages, structure, candidates, *, policy_version=PO
     pixel in a tile is an unchanged EXIF-oriented original pixel. Source geometry
     maps current displayed regions back to that original, avoiding repeated warp.
     """
-    require(policy_version in (LEGACY_POLICY_VERSION, POLICY_VERSION), 'VERIFY_POLICY', '复看策略版本不受支持，请创建新处理轮次。')
+    require(policy_version in (LEGACY_POLICY_VERSION, PREVIOUS_POLICY_VERSION, POLICY_VERSION), 'VERIFY_POLICY', '复看策略版本不受支持，请创建新处理轮次。')
     require(bool(re.fullmatch(r'[A-Za-z0-9_-]+', str(work_id))), 'VERIFY_SCOPE', '复看作业标识无效。')
     root = service.store.root / 'attempt-artifacts' / str(work_id) / 'blind-verification'
     root.mkdir(parents=True, exist_ok=True)
@@ -357,6 +358,22 @@ def _agreement(first, second, answer, *, policy_version):
     choice = answer.get('kind') in ('choice','letter_choice','marked_choice') or answer.get('response_encoding') in ('marked_choice','written_choice','mixed')
     if policy_version == LEGACY_POLICY_VERSION or not choice:
         return same, []
+
+    from .choice import multiple, channels as multiple_channels
+    if policy_version == POLICY_VERSION and multiple(answer):
+        left, left_error = multiple_channels(first, answer)
+        right, right_error = multiple_channels(second, answer)
+        clear = all(not c.get('uncertain') and c.get('visibility', 'visible') == 'visible'
+            and c.get('response_evidence') == 'clear' and not c.get('transcription_uncertain')
+            and not c.get('ambiguous_glyphs') and c.get('literal_evidence') not in ('ambiguous', 'not_visible')
+            for c in (first, second))
+        common = left.keys() & right.keys() & {'marked', 'written'}
+        # Same complete option set and a shared explicit response channel are
+        # required. Raw text alone or a mark-to-handwriting substitution cannot
+        # establish two independent observations of the same response form.
+        agreed = clear and not left_error and not right_error and bool(common) and len(set(left.values()) | set(right.values())) == 1
+        notes = ['两轮多选作答集合一致；字母顺序和分隔格式已归一，原始记录保留。'] if agreed and not same else []
+        return agreed, notes
 
     def channels(cell):
         values = {'marked':frozenset(comparable(v) for v in cell.get('selected_options', [])),

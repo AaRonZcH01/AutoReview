@@ -94,7 +94,7 @@ try {
         $env:AUTOREVIEW_SOURCE_ROOT=$PSScriptRoot
         $taskShell=Join-Path $PSScriptRoot 'src-tauri/target/debug/autoreview-desktop.exe'
         Start-Process -FilePath $taskShell -WindowStyle Hidden -WorkingDirectory $PSScriptRoot
-        Write-Output '已启动 v1.4.2 源码桌面窗口；后台由桌面窗口管理，可正常最小化。'
+        Write-Output '已启动 v1.4.3 源码桌面窗口；后台由桌面窗口管理，可正常最小化。'
         return
     }
     Set-StartupProgress 85 '正在启动本地服务…'
